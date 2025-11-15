@@ -1,22 +1,188 @@
 {% extends 'layout.html' %} {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+  .info-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  .marker-active {
+    filter: hue-rotate(120deg) brightness(1.2);
+  }
+</style>
 {% endblock %} {% block content %}
-<h3>{{ centro.nombre }}</h3>
-<p>Lat: {{ centro.latitud }} | Lon: {{ centro.longitud }}</p>
 
+<!-- Panel de Información del Centro Actual -->
+<div class="info-panel" id="centroInfo">
+  <h3 id="centroNombre">{{ centro.nombre }}</h3>
+  <p class="text-muted" id="centroDireccion">
+    {{ centro.direccion }}{% if centro.distrito %}, {{ centro.distrito }}{% endif %}
+  </p>
+  <p class="small">
+    Coordenadas: <span id="centroLatitud">{{ centro.latitud }}</span>,
+    <span id="centroLongitud">{{ centro.longitud }}</span>
+  </p>
+</div>
+
+<!-- Mapa Interactivo -->
 <div id="map" class="map mb-4"></div>
 
-<h4>Mesas</h4>
-<ul class="list-group">
-  {% for m in mesas %}
-  <li class="list-group-item">Número de Mesa: {{ m.numero_mesa }} | Ubicación: {{ m.ubicacion_detalle }}</li>
-  {% endfor %}
-</ul>
+<!-- Lista de Mesas -->
+<div class="card">
+  <div class="card-body">
+    <h4>Mesas de Votación</h4>
+    <ul class="list-group" id="listaMesas">
+      {% if mesas %} {% for m in mesas %}
+      <li class="list-group-item">
+        <strong>Mesa {{ m.numero_mesa }}</strong>
+        {% if m.ubicacion_detalle %}
+        <span class="text-muted"> - {{ m.ubicacion_detalle }}</span>
+        {% endif %}
+      </li>
+      {% endfor %} {% else %}
+      <li class="list-group-item text-muted">No hay mesas registradas para este centro</li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
 {% endblock %} {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  var map = L.map('map').setView([{{ centro.latitud }}, {{ centro.longitud }}], 17);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  L.marker([{{ centro.latitud }}, {{ centro.longitud }}]).addTo(map);
+  // Datos de todos los centros desde el backend
+  const todosCentros = [
+    {% for c in todos_centros %}
+    {
+      id: "{{ c.id_centro }}",
+      nombre: "{{ c.nombre }}",
+      direccion: "{{ c.direccion }}",
+      distrito: "{{ c.distrito or '' }}",
+      lat: {{ c.latitud if c.latitud else 'null' }},
+      lon: {{ c.longitud if c.longitud else 'null' }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  // Centro actual
+  const centroActualId = "{{ centro.id_centro }}";
+  const centroActual = todosCentros.find(c => c.id === centroActualId);
+
+  // Inicializar mapa centrado en el centro actual
+  let map;
+  if (centroActual && centroActual.lat && centroActual.lon) {
+    map = L.map('map').setView([centroActual.lat, centroActual.lon], 13);
+  } else {
+    // Si no hay coordenadas, centrar en Lima por defecto
+    map = L.map('map').setView([-12.0464, -77.0428], 11);
+  }
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Objeto para almacenar los marcadores
+  const marcadores = {};
+  let marcadorActivo = null;
+
+  // Función para actualizar la información del centro
+  function actualizarInfoCentro(centro) {
+    document.getElementById('centroNombre').textContent = centro.nombre;
+    document.getElementById('centroDireccion').textContent =
+      centro.direccion + (centro.distrito ? ', ' + centro.distrito : '');
+    document.getElementById('centroLatitud').textContent = centro.lat || 'N/A';
+    document.getElementById('centroLongitud').textContent = centro.lon || 'N/A';
+  }
+
+  // Función para cargar mesas de un centro
+  async function cargarMesas(centroId) {
+    try {
+      const response = await fetch(`/api/mesas/${centroId}`);
+      const mesas = await response.json();
+
+      const listaMesas = document.getElementById('listaMesas');
+
+      if (mesas.length === 0) {
+        listaMesas.innerHTML = '<li class="list-group-item text-muted">No hay mesas registradas para este centro</li>';
+      } else {
+        listaMesas.innerHTML = mesas.map(m => `
+          <li class="list-group-item">
+            <strong>Mesa ${m.numero}</strong>
+            ${m.aula ? '<span class="text-muted"> - ' + m.aula + '</span>' : ''}
+          </li>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Error al cargar mesas:', error);
+      document.getElementById('listaMesas').innerHTML =
+        '<li class="list-group-item text-danger">Error al cargar las mesas</li>';
+    }
+  }
+
+  // Función para manejar clic en marcador
+  function onMarkerClick(centro, marker) {
+    // Actualizar marcador activo visualmente
+    if (marcadorActivo) {
+      marcadorActivo.setIcon(iconoNormal);
+    }
+    marker.setIcon(iconoActivo);
+    marcadorActivo = marker;
+
+    // Actualizar información del panel
+    actualizarInfoCentro(centro);
+
+    // Cargar mesas del nuevo centro
+    cargarMesas(centro.id);
+
+    // Centrar mapa en el nuevo centro
+    map.setView([centro.lat, centro.lon], 15);
+
+    // Actualizar URL sin recargar página
+    window.history.pushState({}, '', `/centro/${centro.id}`);
+  }
+
+  // Iconos para marcadores
+  const iconoNormal = L.icon({
+    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
+  const iconoActivo = L.icon({
+    iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
+  // Agregar marcadores para todos los centros
+  todosCentros.forEach(centro => {
+    if (centro.lat && centro.lon) {
+      const esActual = centro.id === centroActualId;
+      const icono = esActual ? iconoActivo : iconoNormal;
+
+      const marker = L.marker([centro.lat, centro.lon], { icon: icono })
+        .addTo(map)
+        .bindPopup(`
+          <strong>${centro.nombre}</strong><br>
+          ${centro.direccion}<br>
+          <small class="text-muted">${centro.distrito}</small>
+        `);
+
+      marker.on('click', () => onMarkerClick(centro, marker));
+
+      marcadores[centro.id] = marker;
+
+      if (esActual) {
+        marcadorActivo = marker;
+      }
+    }
+  });
 </script>
 {% endblock %}

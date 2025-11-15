@@ -21,7 +21,9 @@ def cronograma():
 def detalle(id):
     centro = CentrosVotacion.query.filter_by(id_centro=id).first_or_404()
     mesas = Mesas.query.filter_by(id_centro=id).all()
-    return render_template("detalle.html", centro=centro, mesas=mesas)
+    # Obtener TODOS los centros para mostrarlos en el mapa
+    todos_centros = CentrosVotacion.query.all()
+    return render_template("detalle.html", centro=centro, mesas=mesas, todos_centros=todos_centros)
 
 
 # --- API PARA APP MÓVIL REACT NATIVE ---
