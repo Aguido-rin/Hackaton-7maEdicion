@@ -20,6 +20,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   // 👇 nuevo
   calendar: 'calendar-today',
+  'person.3.fill': 'groups', 
 } as IconMapping;
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
