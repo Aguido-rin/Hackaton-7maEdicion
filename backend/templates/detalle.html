@@ -1,33 +1,22 @@
-{% extends 'layout.html' %}
-
-
-{% block head %}
+{% extends 'layout.html' %} {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-{% endblock %}
-
-
-{% block content %}
+{% endblock %} {% block content %}
 <h3>{{ centro.nombre }}</h3>
-<p>Lat: {{ centro.lat }} | Lon: {{ centro.lon }}</p>
-
+<p>Lat: {{ centro.latitud }} | Lon: {{ centro.longitud }}</p>
 
 <div id="map" class="map mb-4"></div>
 
-
 <h4>Mesas</h4>
 <ul class="list-group">
-{% for m in mesas %}
-<li class="list-group-item">Mesa {{ m.numero }} | Aula {{ m.aula }} | Piso {{ m.piso }}</li>
-{% endfor %}
+  {% for m in mesas %}
+  <li class="list-group-item">Número de Mesa: {{ m.numero_mesa }} | Ubicación: {{ m.ubicacion_detalle }}</li>
+  {% endfor %}
 </ul>
-{% endblock %}
-
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-var map = L.map('map').setView([{{ centro.lat }}, {{ centro.lon }}], 17);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-L.marker([{{ centro.lat }}, {{ centro.lon }}]).addTo(map);
+  var map = L.map('map').setView([{{ centro.latitud }}, {{ centro.longitud }}], 17);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  L.marker([{{ centro.latitud }}, {{ centro.longitud }}]).addTo(map);
 </script>
 {% endblock %}
