@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  FlatList,
-} from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList, Platform } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
+import { API_ENDPOINTS } from "../config";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Detalle'>;
+// Importación condicional de MapView - solo disponible en plataformas nativas
+let MapView: any = null;
+let Marker: any = null;
+
+if (Platform.OS !== "web") {
+  const maps = require("react-native-maps");
+  MapView = maps.default;
+  Marker = maps.Marker;
+}
+
+type Props = NativeStackScreenProps<RootStackParamList, "Detalle">;
 
 interface Centro {
   id_centro: string;
@@ -36,36 +39,34 @@ export default function DetalleScreen({ route }: Props) {
 
   useEffect(() => {
     // Cargar información del centro
-    fetch(`http://TU_API_URL/api/centro/${centroId}`)
-      .then(response => response.json())
+    fetch(API_ENDPOINTS.centro(centroId))
+      .then((response) => response.json())
       .then((data: Centro) => {
         setCentro(data);
         setLoading(false);
       })
-      .catch(error => {
-        console.error('Error al cargar centro:', error);
+      .catch((error) => {
+        console.error("Error al cargar centro:", error);
         setLoading(false);
       });
 
     // Cargar mesas del centro
-    fetch(`http://TU_API_URL/api/mesas/${centroId}`)
-      .then(response => response.json())
+    fetch(API_ENDPOINTS.mesas(centroId))
+      .then((response) => response.json())
       .then((data: Mesa[]) => setMesas(data))
-      .catch(error => console.error('Error al cargar mesas:', error));
+      .catch((error) => console.error("Error al cargar mesas:", error));
 
     // Cargar todos los centros para el mapa
-    fetch('http://TU_API_URL/api/centros')
-      .then(response => response.json())
+    fetch(API_ENDPOINTS.centros)
+      .then((response) => response.json())
       .then((data: Centro[]) => setTodosCentros(data))
-      .catch(error => console.error('Error al cargar centros:', error));
+      .catch((error) => console.error("Error al cargar centros:", error));
   }, [centroId]);
 
   const renderMesa = ({ item }: { item: Mesa }) => (
     <View style={styles.mesaItem}>
       <Text style={styles.mesaNumero}>Mesa {item.numero_mesa}</Text>
-      {item.ubicacion_detalle && (
-        <Text style={styles.mesaUbicacion}> - {item.ubicacion_detalle}</Text>
-      )}
+      {item.ubicacion_detalle && <Text style={styles.mesaUbicacion}> - {item.ubicacion_detalle}</Text>}
     </View>
   );
 
@@ -99,15 +100,15 @@ export default function DetalleScreen({ route }: Props) {
         <Text style={styles.centroNombre}>{centro.nombre}</Text>
         <Text style={styles.centroDireccion}>
           {centro.direccion}
-          {centro.distrito ? `, ${centro.distrito}` : ''}
+          {centro.distrito ? `, ${centro.distrito}` : ""}
         </Text>
         <Text style={styles.coordenadas}>
           Coordenadas: {centro.latitud}, {centro.longitud}
         </Text>
       </View>
 
-      {/* Mapa */}
-      {centro.latitud && centro.longitud && (
+      {/* Mapa - Solo disponible en plataformas nativas */}
+      {Platform.OS !== "web" && centro.latitud && centro.longitud && MapView && Marker && (
         <MapView style={styles.map} initialRegion={region}>
           {/* Marcador del centro actual */}
           <Marker
@@ -122,8 +123,8 @@ export default function DetalleScreen({ route }: Props) {
 
           {/* Marcadores de otros centros */}
           {todosCentros
-            .filter(c => c.id_centro !== centroId && c.latitud && c.longitud)
-            .map(c => (
+            .filter((c) => c.id_centro !== centroId && c.latitud && c.longitud)
+            .map((c) => (
               <Marker
                 key={c.id_centro}
                 coordinate={{
@@ -144,7 +145,7 @@ export default function DetalleScreen({ route }: Props) {
           <FlatList
             data={mesas}
             renderItem={renderMesa}
-            keyExtractor={item => item.numero_mesa.toString()}
+            keyExtractor={(item) => item.numero_mesa.toString()}
             scrollEnabled={false}
           />
         ) : (
@@ -160,20 +161,20 @@ export default function DetalleScreen({ route }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: "#f4f5f7",
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f4f5f7',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f5f7",
   },
   infoPanel: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     margin: 16,
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -181,32 +182,32 @@ const styles = StyleSheet.create({
   },
   centroNombre: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 8,
   },
   centroDireccion: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
     marginBottom: 8,
   },
   coordenadas: {
     fontSize: 12,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   map: {
     height: 320,
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     margin: 16,
     borderRadius: 8,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -214,28 +215,28 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 12,
   },
   mesaItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#dee2e6',
+    borderBottomColor: "#dee2e6",
   },
   mesaNumero: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   mesaUbicacion: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   noMesas: {
     fontSize: 14,
-    color: '#6c757d',
-    fontStyle: 'italic',
+    color: "#6c757d",
+    fontStyle: "italic",
   },
 });

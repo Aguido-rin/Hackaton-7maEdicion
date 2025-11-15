@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,31 +10,67 @@ import {
   Modal,
   ScrollView,
   Linking,
-} from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
-import { Partido } from '../types';
-import { API_ENDPOINTS } from '../config';
+} from "react-native";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { TabParamList } from "../App";
+import { Partido } from "../types/IPartido";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Partidos'>;
+type Props = BottomTabScreenProps<TabParamList, "Partidos">;
 
 export default function PartidosScreen({ navigation }: Props) {
-  const [partidos, setPartidos] = useState<Partido[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [partidos, setPartidos] = useState<Partido[]>([
+    {
+      id_partido: "1",
+      jne_id_simbolo: 1,
+      nombre_partido: "Fuerza Popular",
+      siglas: "FP",
+      fecha_inscripcion: "2020-01-15",
+      logo_base64: null,
+      direccion_legal: "Av. Javier Prado 1234, Lima",
+      telefonos: "511-234-5678",
+      sitio_web: "www.fuerzapopular.com.pe",
+      email_contacto: "contacto@fuerzapopular.com.pe",
+      personero_titular: "Juan García",
+      personero_alterno: "María López",
+      ideologia: "Derecha",
+    },
+    {
+      id_partido: "2",
+      jne_id_simbolo: 2,
+      nombre_partido: "Perú Libre",
+      siglas: "PL",
+      fecha_inscripcion: "2020-06-10",
+      logo_base64: null,
+      direccion_legal: "Jr. Carabaya 567, Lima",
+      telefonos: "511-345-6789",
+      sitio_web: "www.perulibre.com.pe",
+      email_contacto: "info@perulibre.com.pe",
+      personero_titular: "Carlos Rodríguez",
+      personero_alterno: "Patricia Díaz",
+      ideologia: "Izquierda",
+    },
+    {
+      id_partido: "3",
+      jne_id_simbolo: 3,
+      nombre_partido: "APRA",
+      siglas: "APRA",
+      fecha_inscripcion: "2021-03-20",
+      logo_base64: null,
+      direccion_legal: "Av. Abancay 890, Lima",
+      telefonos: "511-456-7890",
+      sitio_web: "www.apra.com.pe",
+      email_contacto: "info@apra.com.pe",
+      personero_titular: "Fernando Sánchez",
+      personero_alterno: "Rosa Martínez",
+      ideologia: "CentroIzquierda",
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
   const [selectedPartido, setSelectedPartido] = useState<Partido | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    fetch(API_ENDPOINTS.partidos)
-      .then(response => response.json())
-      .then((data: Partido[]) => {
-        setPartidos(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error al cargar partidos:', error);
-        setLoading(false);
-      });
+    // Los datos ya están cargados localmente para demostración
   }, []);
 
   const openModal = (partido: Partido) => {
@@ -49,7 +85,7 @@ export default function PartidosScreen({ navigation }: Props) {
 
   const openLink = (url: string | null) => {
     if (url) {
-      Linking.openURL(url.startsWith('http') ? url : `https://${url}`);
+      Linking.openURL(url.startsWith("http") ? url : `https://${url}`);
     }
   };
 
@@ -66,9 +102,7 @@ export default function PartidosScreen({ navigation }: Props) {
             />
           ) : (
             <View style={styles.logoPlaceholder}>
-              <Text style={styles.logoPlaceholderText}>
-                {item.siglas ? item.siglas.substring(0, 2) : '?'}
-              </Text>
+              <Text style={styles.logoPlaceholderText}>{item.siglas ? item.siglas.substring(0, 2) : "?"}</Text>
             </View>
           )}
         </View>
@@ -78,10 +112,8 @@ export default function PartidosScreen({ navigation }: Props) {
           <Text style={styles.partidoNombre} numberOfLines={2}>
             {item.nombre_partido}
           </Text>
-          {item.siglas && (
-            <Text style={styles.partidoSiglas}>{item.siglas}</Text>
-          )}
-          {item.ideologia && item.ideologia !== 'Desconocido' && (
+          {item.siglas && <Text style={styles.partidoSiglas}>{item.siglas}</Text>}
+          {item.ideologia && item.ideologia !== "Desconocido" && (
             <View style={[styles.ideologiaBadge, getIdeologiaColor(item.ideologia)]}>
               <Text style={styles.ideologiaText}>{item.ideologia}</Text>
             </View>
@@ -109,17 +141,12 @@ export default function PartidosScreen({ navigation }: Props) {
       <FlatList
         data={partidos}
         renderItem={renderPartido}
-        keyExtractor={item => item.id_partido}
+        keyExtractor={(item) => item.id_partido}
         contentContainerStyle={styles.list}
       />
 
       {/* Modal de detalle */}
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
+      <Modal animationType="slide" transparent={false} visible={modalVisible} onRequestClose={closeModal}>
         {selectedPartido && (
           <ScrollView style={styles.modalContainer}>
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
@@ -135,56 +162,36 @@ export default function PartidosScreen({ navigation }: Props) {
                 />
               ) : (
                 <View style={styles.modalLogoPlaceholder}>
-                  <Text style={styles.modalLogoText}>
-                    {selectedPartido.siglas || '?'}
-                  </Text>
+                  <Text style={styles.modalLogoText}>{selectedPartido.siglas || "?"}</Text>
                 </View>
               )}
               <Text style={styles.modalTitle}>{selectedPartido.nombre_partido}</Text>
-              {selectedPartido.siglas && (
-                <Text style={styles.modalSiglas}>{selectedPartido.siglas}</Text>
-              )}
+              {selectedPartido.siglas && <Text style={styles.modalSiglas}>{selectedPartido.siglas}</Text>}
             </View>
 
             <View style={styles.modalContent}>
-              {selectedPartido.ideologia && (
-                <DetailRow
-                  label="Ideología"
-                  value={selectedPartido.ideologia}
-                  highlight
-                />
-              )}
+              {selectedPartido.ideologia && <DetailRow label="Ideología" value={selectedPartido.ideologia} highlight />}
               {selectedPartido.fecha_inscripcion && (
                 <DetailRow
                   label="Fecha de Inscripción"
-                  value={new Date(selectedPartido.fecha_inscripcion).toLocaleDateString('es-PE')}
+                  value={new Date(selectedPartido.fecha_inscripcion).toLocaleDateString("es-PE")}
                 />
               )}
               {selectedPartido.direccion_legal && (
                 <DetailRow label="Dirección" value={selectedPartido.direccion_legal} />
               )}
-              {selectedPartido.telefonos && (
-                <DetailRow label="Teléfonos" value={selectedPartido.telefonos} />
-              )}
-              {selectedPartido.email_contacto && (
-                <DetailRow label="Email" value={selectedPartido.email_contacto} />
-              )}
+              {selectedPartido.telefonos && <DetailRow label="Teléfonos" value={selectedPartido.telefonos} />}
+              {selectedPartido.email_contacto && <DetailRow label="Email" value={selectedPartido.email_contacto} />}
               {selectedPartido.sitio_web && (
                 <TouchableOpacity onPress={() => openLink(selectedPartido.sitio_web)}>
                   <DetailRow label="Sitio Web" value={selectedPartido.sitio_web} link />
                 </TouchableOpacity>
               )}
               {selectedPartido.personero_titular && (
-                <DetailRow
-                  label="Personero Titular"
-                  value={selectedPartido.personero_titular}
-                />
+                <DetailRow label="Personero Titular" value={selectedPartido.personero_titular} />
               )}
               {selectedPartido.personero_alterno && (
-                <DetailRow
-                  label="Personero Alterno"
-                  value={selectedPartido.personero_alterno}
-                />
+                <DetailRow label="Personero Alterno" value={selectedPartido.personero_alterno} />
               )}
             </View>
           </ScrollView>
@@ -194,71 +201,79 @@ export default function PartidosScreen({ navigation }: Props) {
   );
 }
 
-const DetailRow = ({ label, value, highlight, link }: { label: string; value: string; highlight?: boolean; link?: boolean }) => (
+const DetailRow = ({
+  label,
+  value,
+  highlight,
+  link,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+  link?: boolean;
+}) => (
   <View style={styles.detailRow}>
     <Text style={styles.detailLabel}>{label}</Text>
-    <Text style={[styles.detailValue, highlight && styles.detailHighlight, link && styles.detailLink]}>
-      {value}
-    </Text>
+    <Text style={[styles.detailValue, highlight && styles.detailHighlight, link && styles.detailLink]}>{value}</Text>
   </View>
 );
 
 const getIdeologiaColor = (ideologia: string) => {
   switch (ideologia) {
-    case 'Izquierda':
-      return { backgroundColor: '#dc3545' };
-    case 'CentroIzquierda':
-      return { backgroundColor: '#fd7e14' };
-    case 'Centro':
-      return { backgroundColor: '#ffc107' };
-    case 'CentroDerecha':
-      return { backgroundColor: '#0dcaf0' };
-    case 'Derecha':
-      return { backgroundColor: '#0d6efd' };
+    case "Izquierda":
+      return { backgroundColor: "#dc3545" };
+    case "CentroIzquierda":
+      return { backgroundColor: "#fd7e14" };
+    case "Centro":
+      return { backgroundColor: "#ffc107" };
+    case "CentroDerecha":
+      return { backgroundColor: "#0dcaf0" };
+    case "Derecha":
+      return { backgroundColor: "#0d6efd" };
     default:
-      return { backgroundColor: '#6c757d' };
+      return { backgroundColor: "#6c757d" };
   }
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: "#f4f5f7",
     padding: 16,
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f4f5f7',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f4f5f7",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    color: '#333',
+    color: "#333",
   },
   subtitle: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
     marginBottom: 16,
   },
   list: {
     paddingBottom: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
   },
   logoContainer: {
@@ -273,63 +288,63 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: '#e9ecef',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#e9ecef",
+    justifyContent: "center",
+    alignItems: "center",
   },
   logoPlaceholderText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#6c757d',
+    fontWeight: "bold",
+    color: "#6c757d",
   },
   info: {
     flex: 1,
   },
   partidoNombre: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 4,
   },
   partidoSiglas: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
     marginBottom: 4,
   },
   ideologiaBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   ideologiaText: {
     fontSize: 12,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   arrow: {
     fontSize: 24,
-    color: '#6c757d',
+    color: "#6c757d",
     marginLeft: 8,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   closeButton: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     padding: 16,
   },
   closeButtonText: {
     fontSize: 16,
-    color: '#0d6efd',
-    fontWeight: '600',
+    color: "#0d6efd",
+    fontWeight: "600",
   },
   modalHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#dee2e6',
+    borderBottomColor: "#dee2e6",
   },
   modalLogo: {
     width: 120,
@@ -340,26 +355,26 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 12,
-    backgroundColor: '#e9ecef',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#e9ecef",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   modalLogoText: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: '#6c757d',
+    fontWeight: "bold",
+    color: "#6c757d",
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
     marginBottom: 8,
   },
   modalSiglas: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   modalContent: {
     padding: 24,
@@ -369,21 +384,21 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#6c757d',
+    fontWeight: "600",
+    color: "#6c757d",
     marginBottom: 4,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   detailValue: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   detailHighlight: {
-    fontWeight: 'bold',
-    color: '#0d6efd',
+    fontWeight: "bold",
+    color: "#0d6efd",
   },
   detailLink: {
-    color: '#0d6efd',
-    textDecorationLine: 'underline',
+    color: "#0d6efd",
+    textDecorationLine: "underline",
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,28 +9,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+} from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../App";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
   const [isLogin, setIsLogin] = useState(true);
-  const [dni, setDni] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [dni, setDni] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = () => {
-    // Por ahora solo navega al Home sin validación
-    navigation.replace('MainTabs');
+    // Navega a MainTabs (que contiene HomeScreen con la barra de navegación)
+    navigation.replace("MainTabs");
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Logo/Header */}
         <View style={styles.header}>
@@ -44,21 +41,11 @@ export default function LoginScreen({ navigation }: Props) {
         {/* Formulario */}
         <View style={styles.formContainer}>
           <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, isLogin && styles.tabActive]}
-              onPress={() => setIsLogin(true)}
-            >
-              <Text style={[styles.tabText, isLogin && styles.tabTextActive]}>
-                Iniciar Sesión
-              </Text>
+            <TouchableOpacity style={[styles.tab, isLogin && styles.tabActive]} onPress={() => setIsLogin(true)}>
+              <Text style={[styles.tabText, isLogin && styles.tabTextActive]}>Iniciar Sesión</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, !isLogin && styles.tabActive]}
-              onPress={() => setIsLogin(false)}
-            >
-              <Text style={[styles.tabText, !isLogin && styles.tabTextActive]}>
-                Registrarse
-              </Text>
+            <TouchableOpacity style={[styles.tab, !isLogin && styles.tabActive]} onPress={() => setIsLogin(false)}>
+              <Text style={[styles.tabText, !isLogin && styles.tabTextActive]}>Registrarse</Text>
             </TouchableOpacity>
           </View>
 
@@ -104,16 +91,12 @@ export default function LoginScreen({ navigation }: Props) {
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>
-                {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
-              </Text>
+              <Text style={styles.buttonText}>{isLogin ? "Iniciar Sesión" : "Registrarse"}</Text>
             </TouchableOpacity>
 
             {isLogin && (
               <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>
-                  ¿Olvidaste tu contraseña?
-                </Text>
+                <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -121,9 +104,7 @@ export default function LoginScreen({ navigation }: Props) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Al continuar, aceptas nuestros términos y condiciones
-          </Text>
+          <Text style={styles.footerText}>Al continuar, aceptas nuestros términos y condiciones</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -133,24 +114,24 @@ export default function LoginScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: "#f4f5f7",
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   logoCircle: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#0d6efd',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#0d6efd",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   logoText: {
@@ -158,47 +139,47 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   formContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
   tabContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 24,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: "#f4f5f7",
     borderRadius: 8,
     padding: 4,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: 6,
   },
   tabActive: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   tabText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#6c757d',
+    fontWeight: "600",
+    color: "#6c757d",
   },
   tabTextActive: {
-    color: '#0d6efd',
+    color: "#0d6efd",
   },
   form: {
     gap: 16,
@@ -208,46 +189,46 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: "#dee2e6",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
+    color: "#333",
+    backgroundColor: "#fff",
   },
   button: {
-    backgroundColor: '#0d6efd',
+    backgroundColor: "#0d6efd",
     borderRadius: 8,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   forgotPassword: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 12,
   },
   forgotPasswordText: {
-    color: '#0d6efd',
+    color: "#0d6efd",
     fontSize: 14,
   },
   footer: {
     marginTop: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   footerText: {
     fontSize: 12,
-    color: '#6c757d',
-    textAlign: 'center',
+    color: "#6c757d",
+    textAlign: "center",
   },
 });
