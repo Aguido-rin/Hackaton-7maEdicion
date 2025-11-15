@@ -3,9 +3,9 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from datetime import datetime
-from backend.app import create_app  # Importa el factory de tu app Flask
-from backend.extensions import db
-from backend.models import PartidosPoliticos
+from app import create_app  # Importa el factory de tu app Flask
+from extensions import db
+from models import PartidosPoliticos
 
 # --- Configuración ---
 # URL base para completar las URLs relativas de los logos

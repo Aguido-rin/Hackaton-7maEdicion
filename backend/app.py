@@ -1,28 +1,30 @@
 from flask import Flask
-from backend.config import Config
-from backend.extensions import db
-import backend.models as models
+from config import Config
+from extensions import db
+from flask_migrate import Migrate   # <-- IMPORTANTE
+import models  # <-- Se importa SIN alias para que Migrate detecte todos los modelos
 
 # Importar Blueprint
 from main.routes import main
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Inicializar base de datos
+    # Inicializar DB
     db.init_app(app)
+
+    # Inicializar Flask-Migrate (ahora sí tienes comandos flask db)
+    migrate = Migrate(app, db)
 
     # Registrar Blueprint
     app.register_blueprint(main)
 
-    # Crear tablas si no existen
-    with app.app_context():
-        db.create_all()
-
     return app
 
 
+# Se expone la app para flask --app
 app = create_app()
 
 if __name__ == "__main__":

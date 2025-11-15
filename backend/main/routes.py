@@ -1,8 +1,8 @@
 import base64
 from flask import render_template, jsonify, request
 from . import main
-from backend.models import CentrosVotacion, Mesas, PartidosPoliticos
-from backend.extensions import db
+from models import CentrosVotacion, Mesas, PartidosPoliticos
+from extensions import db
 
 # --- RUTAS WEB ACTUALIZADAS ---
 
