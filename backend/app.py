@@ -1,7 +1,7 @@
 from flask import Flask
-from backend.config import Config
-from backend.extensions import db
-import backend.models as models 
+from config import Config
+from extensions import db
+import models as models 
 
 # Importar Blueprints
 from main.routes import main

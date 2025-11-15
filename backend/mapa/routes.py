@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from backend.models import CentroVotacion, Mesa
-from backend.extensions import db
+from models import CentrosVotacion, Mesas
+from extensions import db
 
 mapa = Blueprint("mapa", __name__)
 
@@ -16,26 +16,28 @@ def api_centros():
     dni = request.args.get("dni")
     nombre = request.args.get("nombre")
 
-    query = CentroVotacion.query
+    query = CentrosVotacion.query
 
     if distrito:
         query = query.filter_by(distrito=distrito)
 
     if nombre:
-        query = query.filter(CentroVotacion.nombre.like(f"%{nombre}%"))
+        query = query.filter(CentrosVotacion.nombre.like(f"%{nombre}%"))
 
     if dni:
-        query = query.join(Mesa).filter(Mesa.dni_responsable == dni)
+        # Filtrado por dni no implementado: la estructura actual de modelos
+        # no incluye 'dni_responsable' en 'Mesas'. Omite este filtro.
+        pass
 
     centros = query.all()
 
     result = [
         {
-            "id": c.id,
+            "id": c.id_centro,
             "nombre": c.nombre,
             "distrito": c.distrito,
-            "lat": c.lat,
-            "lng": c.lng
+            "lat": float(c.latitud) if c.latitud is not None else None,
+            "lng": float(c.longitud) if c.longitud is not None else None
         }
         for c in centros
     ]
