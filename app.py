@@ -1,9 +1,10 @@
 from flask import Flask
 from config import Config
 from extensions import db
+import models 
 
 # Importar Blueprint
-from main.routes import main
+from main import main 
 
 def create_app():
     app = Flask(__name__)
