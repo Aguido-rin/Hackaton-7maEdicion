@@ -1,13 +1,25 @@
-{% extends 'layout.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-<h3>Centros de votación</h3>
-<ul class="list-group">
-  {% for c in centros %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    {{ c.nombre }}
-    <a href="/centro/{{ c.id }}" class="btn btn-primary btn-sm">Ver</a>
-  </li>
-  {% endfor %}
-</ul>
+
+<h2 class="mb-3">Lista de Centros de Votación</h2>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Centro</th>
+            <th>Distrito</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in centros %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.nombre }}</td>
+            <td>{{ c.distrito }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}
