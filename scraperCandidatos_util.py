@@ -6,6 +6,11 @@ from datetime import datetime
 from app import create_app
 from extensions import db
 from models import Candidatos
+from sqlalchemy.exc import IntegrityError
+
+#instalar dependencias: venv38/Scripts/activate && pip install -r requirements.txt
+#Ejecución: python scraperCandidatos_util.py
+
 
 # --- Configuración ---
 SOURCE_GOBERNADORES = "gobernadores.html" 
@@ -79,8 +84,13 @@ def download_image(url):
     """Descarga la imagen y devuelve los datos binarios (BLOB)."""
     if not url:
         return None
+    # Algunos servidores rechazan peticiones sin User-Agent o Referer.
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+        'Referer': 'https://eleccionesperu.pe/'
+    }
     try:
-        response = requests.get(url, timeout=10, stream=True)
+        response = requests.get(url, headers=headers, timeout=10, stream=True)
         response.raise_for_status()
         return response.content
     except requests.RequestException as e:
@@ -96,12 +106,27 @@ def populate_database(app):
         # Parsear ambos archivos
         gobernadores_list = parse_candidatos_html(SOURCE_GOBERNADORES, "Gobernador")
         alcaldes_list = parse_candidatos_html(SOURCE_ALCALDES, "Alcalde")
-        
+
         candidatos_list = gobernadores_list + alcaldes_list
-        
+
         if not candidatos_list:
             print("No hay datos para poblar. Terminando.")
             return
+
+        # Deduplicar por 'perfil_url' antes de insertar (evita IntegrityError por UNIQUE)
+        seen_urls = set()
+        unique_candidates = []
+        dup_count = 0
+        for c in candidatos_list:
+            url = c.get('perfil_url')
+            if url and url in seen_urls:
+                dup_count += 1
+                continue
+            if url:
+                seen_urls.add(url)
+            unique_candidates.append(c)
+        if dup_count:
+            print(f"Omitidos {dup_count} candidatos duplicados por 'perfil_url' en la entrada.")
 
         try:
             # Usamos el __tablename__ para la operación de borrado
@@ -111,21 +136,27 @@ def populate_database(app):
             num_deleted = db.session.query(Candidatos).delete()
             print(f"Se eliminaron {num_deleted} registros antiguos.")
             
-            print(f"Insertando {len(candidatos_list)} candidatos nuevos en la BD...")
-            
-            for data in candidatos_list:
+            print(f"Insertando {len(unique_candidates)} candidatos nuevos en la BD...")
+
+            for data in unique_candidates:
                 imagen_blob = download_image(data.get('imagen_url'))
-                
+
                 nuevo_candidato = Candidatos(
                     nombre_completo=data.get('nombre_candidato'),
                     tipo_candidatura=data.get('tipo_candidato'),
                     perfil_url=data.get('perfil_url'),
                     imagen_blob=imagen_blob
-                    # El campo 'partido_politico_id' se deja en NULL
-                    # hasta que ejecutemos el scraper de segundo nivel.
                 )
-                db.session.add(nuevo_candidato)
-            
+                try:
+                    db.session.add(nuevo_candidato)
+                    # Ejecutar flush por registro para capturar errores de UNIQUE inmediatamente
+                    db.session.flush()
+                except IntegrityError:
+                    db.session.rollback()
+                    print(f"Omitido candidato duplicado en BD: {data.get('perfil_url')}")
+                    continue
+
+            # Commit final después de filtrar/omitir duplicados
             db.session.commit()
             print("¡Base de datos de candidatos poblada exitosamente!")
             
