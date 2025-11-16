@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from app import create_app
 from extensions import db
-from models import CandidatoRegional  # Importamos el modelo corregido
+from models import Candidatos
 
 # --- Configuración ---
 SOURCE_GOBERNADORES = "gobernadores.html" 
@@ -105,10 +105,10 @@ def populate_database(app):
 
         try:
             # Usamos el __tablename__ para la operación de borrado
-            table_name = CandidatoRegional.__tablename__
+            table_name = Candidatos.__tablename__
             print(f"Limpiando tabla '{table_name}'...")
             
-            num_deleted = db.session.query(CandidatoRegional).delete()
+            num_deleted = db.session.query(Candidatos).delete()
             print(f"Se eliminaron {num_deleted} registros antiguos.")
             
             print(f"Insertando {len(candidatos_list)} candidatos nuevos en la BD...")
@@ -116,7 +116,7 @@ def populate_database(app):
             for data in candidatos_list:
                 imagen_blob = download_image(data.get('imagen_url'))
                 
-                nuevo_candidato = CandidatoRegional(
+                nuevo_candidato = Candidatos(
                     nombre_completo=data.get('nombre_candidato'),
                     tipo_candidatura=data.get('tipo_candidato'),
                     perfil_url=data.get('perfil_url'),

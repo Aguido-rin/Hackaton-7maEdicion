@@ -143,9 +143,9 @@ class Candidatos(db.Model):
     region = db.Column(db.String(50), nullable=True)
     biografia = db.Column(db.Text, nullable=True)
     
-    fecha_creacion = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    fecha_creacion = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     partido_politico = relationship('PartidosPoliticos', backref=db.backref('candidatos', lazy=True))
 
     def __repr__(self):
-        return f'<CandidatoRegional {self.nombre_completo}>'
+        return f'<Candidato {self.nombre_completo}>'
