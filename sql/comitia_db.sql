@@ -132,3 +132,4 @@ VALUES (
 );
 
 SELECT * FROM PartidosPoliticos;
+SELECT * FROM candidatos;
