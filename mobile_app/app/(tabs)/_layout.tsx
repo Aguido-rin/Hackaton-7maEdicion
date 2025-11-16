@@ -64,6 +64,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="miembros"
+        options={{
+          title: "Miembros",
+          // usa un icono que ya tengas mapeado (ej: paperplane.fill)
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          ),
+        }}
+      />
         
     </Tabs>
   );
