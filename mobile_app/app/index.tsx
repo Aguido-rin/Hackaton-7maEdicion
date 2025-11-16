@@ -38,7 +38,7 @@ export default function LoginScreen() {
       if (resp.data && resp.data.success) {
         // Login correcto — navegar a mapa
         // Puedes guardar `resp.data` en un storage seguro si lo deseas
-        router.push("/mapa");
+        router.push("/home");
       } else {
         Alert.alert("Error", resp.data?.error || "Respuesta inesperada del servidor");
       }

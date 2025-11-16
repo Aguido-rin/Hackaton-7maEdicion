@@ -118,7 +118,7 @@ const ChatbotScreen = ({ isVisible, onClose, apiKey }) => {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 20,
+    bottom: 120,
     right: 20,
     backgroundColor: "#f8f9fa",
     borderRadius: 10,
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   collapsed: {
-    width: 200,
-    height: 100,
+    width: 300,
+    height: 120,
   },
   expanded: {
     width: 300,

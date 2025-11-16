@@ -100,9 +100,9 @@ export default function MapaScreen() {
       </ScrollView>
       {/* Botón flotante (FAB) para abrir el chatbot */}
       <TouchableOpacity style={styles.fab} onPress={() => setIsChatbotVisible(true)}>
-        <Text style={styles.fabIcon}>?</Text>
+        <Text style={styles.fabIcon}>Yanapaq </Text>
       </TouchableOpacity>
-      
+
       {/* ¡Advertencia de Seguridad! 
           No expongas tu API Key aquí. 
           Recomiendo usar variables de entorno.
@@ -110,7 +110,7 @@ export default function MapaScreen() {
       <ChatbotScreen
         isVisible={isChatbotVisible}
         onClose={() => setIsChatbotVisible(false)}
-        apiKey="AIzaSyBExd-A--7cs8PrOSfVweYrqTNcmgcLwQg"
+        apiKey="AIzaSyA45fj4g3vXhaP9W8wsBcolpmMuforhPXI"
       />
     </View>
   );
@@ -164,13 +164,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     right: 20,
-    bottom: 20,
+    bottom: 60,
     backgroundColor: "#007AFF",
     borderRadius: 28,
     elevation: 8,
   },
   fabIcon: {
-    fontSize: 24,
+    fontSize: 14,
     color: "white",
   },
 });

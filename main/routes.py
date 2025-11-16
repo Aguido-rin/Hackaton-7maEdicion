@@ -242,8 +242,8 @@ def api_candidatos():
     Usa LEFT JOIN para mostrar candidatos sin partido.
     """
     try:
-        # Obtener parámetros de consulta
-        partido_nombre = request.args.get('partido_nombre', None)
+        # --- CAMBIO: Se obtiene 'nombre_completo' en lugar de 'partido_nombre' ---
+        nombre_candidato = request.args.get('nombre_completo', None)
 
         # Construir la consulta inicial usando OUTERJOIN (LEFT JOIN)
         query = db.session.query(Candidatos, PartidosPoliticos).outerjoin(
@@ -251,9 +251,9 @@ def api_candidatos():
             Candidatos.partido_politico_id == PartidosPoliticos.id_partido
         )
 
-        # Aplicar filtro por nombre del partido si se proporciona
-        if partido_nombre:
-            query = query.filter(PartidosPoliticos.nombre_partido.ilike(f'%{partido_nombre}%'))
+        # --- CAMBIO: Aplicar filtro por nombre del candidato si se proporciona ---
+        if nombre_candidato:
+            query = query.filter(Candidatos.nombre_completo.ilike(f'%{nombre_candidato}%'))
 
         # Ejecutar la consulta
         results = query.all()
