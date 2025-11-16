@@ -54,6 +54,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="elector"
+        options={{
+          title: "Elector",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="chevron.right" color={color} />
+            // si luego quieres, te enseño cómo agregar un iconito tipo "persona"
+          ),
+        }}
+      />
         
     </Tabs>
   );
