@@ -1,5 +1,6 @@
 // app/(tabs)/miembros/index.tsx
 import React, { useMemo, useState } from 'react';
+import { addEventToCalendar } from '@/utils/calendar';
 import {
   View,
   Text,
@@ -165,11 +166,34 @@ export default function MemberScreen() {
     []
   );
 
-  const handleAddToCalendar = () => {
-    Alert.alert(
-      'Próximamente',
-      'La opción para agregar estas actividades a tu calendario se podrá integrar en una siguiente versión.'
-    );
+  // Agregar UNA actividad específica al calendario (web + nativo)
+  const handleAddActivityToCalendar = async (activity: MemberActivity) => {
+    const start = new Date(`${activity.date}T${activity.time}:00`);
+    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 horas
+
+    await addEventToCalendar({
+      title: activity.title,
+      notes:
+        `${activity.description}` +
+        (activity.place ? `\nLugar: ${activity.place}` : ''),
+      startDate: start,
+      endDate: end,
+    });
+  };
+
+  // Botón morado: agrega SOLO el día de la elección
+  const handleAddElectionDayToCalendar = async () => {
+    const election = sortedActivities.find((a) => a.type === 'ELECCION');
+
+    if (!election) {
+      Alert.alert(
+        'Sin información',
+        'No se encontró el día de la elección en el calendario.'
+      );
+      return;
+    }
+
+    await handleAddActivityToCalendar(election);
   };
 
   const renderActivity = ({ item }: { item: MemberActivity }) => {
@@ -202,6 +226,16 @@ export default function MemberScreen() {
         )}
 
         <Text style={styles.activityDescription}>{item.description}</Text>
+
+        <Pressable
+          style={styles.activityAddButton}
+          onPress={() => handleAddActivityToCalendar(item)}
+        >
+          <MaterialIcons name="add-alert" size={14} color="#4f46e5" />
+          <Text style={styles.activityAddButtonText}>
+            Agregar a mi calendario
+          </Text>
+        </Pressable>
       </View>
     );
   };
@@ -287,11 +321,11 @@ export default function MemberScreen() {
 
             <Pressable
               style={styles.calendarButton}
-              onPress={handleAddToCalendar}
+              onPress={handleAddElectionDayToCalendar}
             >
               <MaterialIcons name="add-alert" size={18} color="#fff" />
               <Text style={styles.calendarButtonText}>
-                Agregar a mi calendario (próximamente)
+                Agregar el día de la elección a mi calendario
               </Text>
             </Pressable>
           </View>
@@ -358,8 +392,15 @@ export default function MemberScreen() {
             {VOTING_STEPS.map((step, index) => (
               <View key={step.title} style={styles.stepCard}>
                 <View style={styles.stepHeaderRow}>
-                  <View style={[styles.stepNumberCircle, { backgroundColor: '#f59e0b20' }]}>
-                    <Text style={[styles.stepNumberText, { color: '#b45309' }]}>
+                  <View
+                    style={[
+                      styles.stepNumberCircle,
+                      { backgroundColor: '#f59e0b20' },
+                    ]}
+                  >
+                    <Text
+                      style={[styles.stepNumberText, { color: '#b45309' }]}
+                    >
                       {index + 1}
                     </Text>
                   </View>
@@ -589,6 +630,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#4b5563',
     marginTop: 2,
+  },
+  activityAddButton: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: '#eef2ff',
+  },
+  activityAddButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#4f46e5',
   },
   calendarButton: {
     flexDirection: 'row',
