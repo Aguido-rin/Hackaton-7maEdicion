@@ -24,6 +24,16 @@ class CentrosVotacion(db.Model):
     # Relación: Un centro de votación tiene muchas mesas
     mesas = relationship('Mesas', back_populates='centro_votacion', lazy=True)
 
+    def to_dict(self):
+        return {
+            'id_centro': self.id_centro,
+            'nombre': self.nombre,
+            'direccion': self.direccion,
+            'distrito': self.distrito,
+            'latitud': float(self.latitud) if self.latitud is not None else None,
+            'longitud': float(self.longitud) if self.longitud is not None else None,
+        }
+
     def __repr__(self):
         return f'<CentrosVotacion {self.nombre}>'
 

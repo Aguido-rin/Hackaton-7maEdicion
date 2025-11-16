@@ -25,6 +25,171 @@
 <div class="timeline-container" id="timelineContainer">
     <!-- Los eventos se cargarán dinámicamente aquí -->
 </div>
+
+<style>
+    /* Estilos para las pestañas principales */
+    .year-tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .year-tab {
+        background: none;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+    
+    .year-tab.active {
+        border-bottom: 3px solid #007bff;
+        color: #007bff;
+        font-weight: bold;
+    }
+    
+    .year-tab:hover:not(.active) {
+        background-color: #f8f9fa;
+    }
+    
+    /* Estilos para las pestañas de meses */
+    .month-tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .month-tab {
+        background: none;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+    }
+    
+    .month-tab.active {
+        border-bottom: 2px solid #28a745;
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .month-tab:hover:not(.active) {
+        background-color: #f8f9fa;
+    }
+    
+    /* Estilos para la línea de tiempo */
+    .timeline-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .timeline-item {
+        display: flex;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 85px;
+        top: 0;
+        bottom: -30px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item:last-child::before {
+        display: none;
+    }
+    
+    .date-badge {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        min-width: 120px;
+        text-align: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .timeline-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .icon-badge {
+        font-size: 20px;
+        margin-right: 12px;
+        width: 30px;
+        text-align: center;
+    }
+    
+    .timeline-content ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    
+    .timeline-content li {
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    
+    .no-events {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .timeline-item {
+            flex-direction: column;
+        }
+        
+        .timeline-item::before {
+            left: 15px;
+        }
+        
+        .date-badge {
+            margin-right: 0;
+            margin-bottom: 15px;
+            align-self: flex-start;
+        }
+        
+        .year-tab, .month-tab {
+            min-width: 80px;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
@@ -300,7 +465,7 @@
         
         months.forEach((month, index) => {
             const button = document.createElement('button');
-            button.className = 'month-tab active';
+            button.className = 'month-tab' + (index === 0 ? ' active' : '');
             button.dataset.month = month;
             
             // Asignar nombres legibles para las pestañas
@@ -323,19 +488,21 @@
         });
     }
 
-    document.querySelectorAll('.year-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            currentYear = this.dataset.year;
-            currentMonth = tabsData[currentYear][0];
-            updateMonthTabs(currentYear);
-            renderTimeline();
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.year-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentYear = this.dataset.year;
+                currentMonth = tabsData[currentYear][0];
+                updateMonthTabs(currentYear);
+                renderTimeline();
+            });
         });
-    });
 
-    // Inicializar
-    updateMonthTabs(currentYear);
-    renderTimeline();
+        // Inicializar
+        updateMonthTabs(currentYear);
+        renderTimeline();
+    });
 </script>
 {% endblock %}

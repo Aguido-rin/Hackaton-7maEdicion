@@ -1,14 +1,25 @@
 import base64
 from flask import Blueprint, render_template, jsonify
-from models import PartidosPoliticos 
+from models import PartidosPoliticos, CentrosVotacion
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
     """Ruta principal (web)."""
-    # Esta ruta sigue sirviendo tu aplicación web si la tienes
-    return render_template('index.html')
+    centros_query = CentrosVotacion.query.all()
+    centros = [
+        {
+            "id_centro": c.id_centro,
+            "nombre": c.nombre,
+            "distrito": c.distrito,
+            "latitud": float(c.latitud) if c.latitud is not None else None,
+            "longitud": float(c.longitud) if c.longitud is not None else None,
+            "ubicacion_detalle": c.mesas[0].ubicacion_detalle if c.mesas else None
+        }
+        for c in centros_query
+    ]
+    return render_template('index.html', centros=centros)
 
 # --- INICIO: API PARA LA APP MÓVIL ---
 
@@ -60,12 +71,6 @@ def get_partidos():
         return jsonify({"error": str(e)}), 500
 
 # --- FIN: API PARA LA APP MÓVIL ---
-
-@main.route('/mapa')
-def mapa():
-    """Ruta de mapa (web)."""
-    # Esta ruta también es parte de tu app web
-    return render_template('mapa.html')
 
 # ... (puedes añadir tus otras rutas web aquí si es necesario)
 
