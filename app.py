@@ -3,6 +3,7 @@ from config import Config
 from extensions import db
 import models as models
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 # Importar Blueprints
 from main.routes import main
@@ -11,6 +12,10 @@ from mapa.routes import mapa
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    #instalas cors pip install flask-cors
+    # Habilitar CORS
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Inicializar base de datos
     db.init_app(app)
