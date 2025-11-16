@@ -3,7 +3,7 @@ from extensions import db
 from sqlalchemy import String, Integer, Date, Enum, ForeignKey, Numeric, Text, DateTime
 from sqlalchemy.dialects.mysql import CHAR, MEDIUMBLOB
 from sqlalchemy.orm import relationship
-from datetime import datetime 
+from datetime import datetime, timezone 
 
 # --- Modelos de Usuarios y Ubicación ---
 
