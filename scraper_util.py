@@ -7,7 +7,7 @@ from app import create_app  # Importa el factory de tu app Flask
 from extensions import db
 from models import PartidosPoliticos
 
-#instalar dependencias: venv38/Scripts/activate && pip install -r requirements.txt
+#instalar dependencias: source venv38/Scripts/activate && pip install -r requirements.txt
 #Ejecución: python scraper_util.py
 
 # --- Configuración ---
