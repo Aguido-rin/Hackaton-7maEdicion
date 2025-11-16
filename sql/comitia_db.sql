@@ -13,7 +13,7 @@ USE comitia_db;
 SET default_storage_engine=InnoDB;
 
 -- -----------------------------------------------------
--- Tabla: CentrosVotacion (Se mantiene para usuarios)
+-- Tabla: CentrosVotacion
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS CentrosVotacion (
   id_centro CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS CentrosVotacion (
 
 
 -- -----------------------------------------------------
--- Tabla: Mesas (Se mantiene para usuarios)
+-- Tabla: Mesas
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS Mesas (
   id_mesa INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,12 +34,17 @@ CREATE TABLE IF NOT EXISTS Mesas (
   numero_mesa VARCHAR(10) NOT NULL UNIQUE,
   ubicacion_detalle VARCHAR(255), 
   
+  -- Índice para acelerar las búsquedas por centro
+  INDEX idx_id_centro (id_centro), 
+  
   FOREIGN KEY (id_centro) REFERENCES CentrosVotacion(id_centro)
+    ON DELETE RESTRICT -- Opcional: previene borrar un centro si tiene mesas
+    ON UPDATE CASCADE
 ) COMMENT='Mesas de sufragio y su ubicación detallada.';
 
 
 -- -----------------------------------------------------
--- Tabla: Usuarios (Se mantiene para usuarios)
+-- Tabla: Usuarios
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS Usuarios (
   id_usuario CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -49,13 +54,20 @@ CREATE TABLE IF NOT EXISTS Usuarios (
   id_mesa INT NULL,           
   rol ENUM('Elector', 'MiembroMesa') NOT NULL DEFAULT 'Elector',
   
+  -- Índice para acelerar las búsquedas por DNI (ya cubierto por UNIQUE)
+  -- INDEX idx_dni (dni), -- 'UNIQUE' ya crea un índice
+  
+  -- Índice para acelerar las búsquedas por mesa
+  INDEX idx_id_mesa (id_mesa), 
+  
   FOREIGN KEY (id_mesa) REFERENCES Mesas(id_mesa)
+    ON DELETE SET NULL -- Si se borra la mesa, el usuario no se borra
+    ON UPDATE CASCADE
 ) COMMENT='Almacena SOLO a los usuarios registrados en la app.';
 
 
 -- -----------------------------------------------------
--- Tabla: PartidosPoliticos (¡MODIFICADA!)
--- Optimizada para almacenar los datos del JNE y el logo como BLOB.
+-- Tabla: PartidosPoliticos
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS PartidosPoliticos (
   id_partido CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -64,19 +76,59 @@ CREATE TABLE IF NOT EXISTS PartidosPoliticos (
   siglas VARCHAR(50) NULL,
   fecha_inscripcion DATE NULL,
   
-  -- Campo para almacenar la imagen del logo (para la IA)
   logo_blob MEDIUMBLOB NULL COMMENT 'Datos binarios de la imagen del logo',
+  nombre_candidato_principal VARCHAR(255) NULL COMMENT 'Nombre del candidato principal',
+  foto_candidato_principal MEDIUMBLOB NULL COMMENT 'Foto del candidato principal',
   
-  -- Campos de información de contacto (del HTML)
   direccion_legal VARCHAR(255) NULL,
   telefonos VARCHAR(100) NULL,
   sitio_web VARCHAR(255) NULL,
   email_contacto VARCHAR(255) NULL,
   
-  -- Campos de personeros (del HTML)
   personero_titular VARCHAR(255) NULL,
   personero_alterno VARCHAR(255) NULL,
   
-  -- Campo de ideología (se mantiene)
-  ideologia ENUM('Izquierda', 'CentroIzquierda', 'Centro', 'CentroDerecha', 'Derecha', 'Otro', 'Desconocido') NULL DEFAULT 'Desconocido'
+  ideologia ENUM('Izquierda', 'CentroIzquierda', 'Centro', 'CentroDerecha', 'Derecha', 'Otro', 'Desconocido') NULL DEFAULT 'Desconocido',
+
+  -- Índice para acelerar búsquedas por nombre (como en models.py)
+  INDEX idx_nombre_partido (nombre_partido)
+  
 ) COMMENT='Agrupaciones políticas. Logos guardados como BLOB.';
+
+INSERT INTO CentrosVotacion (id_centro, nombre, direccion, distrito, latitud, longitud)
+VALUES (
+  UUID(),
+  'IE 7069 José María Arguedas',
+  'Av. Los Héroes 345',
+  'San Juan de Miraflores',
+  -12.157892,
+  -76.971234
+);
+
+INSERT INTO CentrosVotacion (id_centro, nombre, direccion, distrito, latitud, longitud)
+VALUES (
+  UUID(),
+  'Colegio Nacional Ricardo Palma',
+  'Jr. Los Sauces 180',
+  'Surquillo',
+  -12.112345,
+  -77.012345
+);
+
+SELECT id_centro, nombre FROM CentrosVotacion;
+
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle)
+VALUES (
+  'c92c46b4-c254-11f0-9f78-a841f415c3a6',
+  '045123',
+  'Pabellón A - Aula 4'
+);
+
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle)
+VALUES (
+  'c92e2d81-c254-11f0-9f78-a841f415c3a6',
+  '045124',
+  'Pabellón B - Aula 7'
+);
+
+SELECT * FROM PartidosPoliticos;
