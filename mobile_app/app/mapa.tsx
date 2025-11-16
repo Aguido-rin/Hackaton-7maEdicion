@@ -110,7 +110,7 @@ export default function MapaScreen() {
       <ChatbotScreen
         isVisible={isChatbotVisible}
         onClose={() => setIsChatbotVisible(false)}
-        apiKey="AIzaSyA45fj4g3vXhaP9W8wsBcolpmMuforhPXI"
+        apiKey="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"
       />
     </View>
   );

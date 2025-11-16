@@ -69,6 +69,16 @@ export default function HomeScreen() {
             </View>
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
+
+          {/* Opción 5: Cronograma */}
+          <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/Cronograma")}>
+            <MaterialIcons name="person-search" size={30} color="#007AFF" />
+            <View style={styles.menuTextContainer}>
+              <Text style={styles.menuButtonText}>Cronograma</Text>
+              <Text style={styles.menuButtonDescription}>Fechas para los próximos eventos</Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
