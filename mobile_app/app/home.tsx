@@ -50,9 +50,9 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 4: electores */}
+          {/* Opción 4: electores - CAMBIADO */}
           <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/electores")}>
-            <MaterialIcons name="person-search" size={30} color="#007AFF" />
+            <MaterialIcons name="how-to-vote" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
               <Text style={styles.menuButtonText}>Electores</Text>
               <Text style={styles.menuButtonDescription}>Instrucciones para los Votantes</Text>
@@ -60,9 +60,9 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 5: miembrosmesa */}
+          {/* Opción 5: miembrosmesa - CAMBIADO */}
           <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/miembrosmesa")}>
-            <MaterialIcons name="person-search" size={30} color="#007AFF" />
+            <MaterialIcons name="supervisor-account" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
               <Text style={styles.menuButtonText}>Miembros de Mesa</Text>
               <Text style={styles.menuButtonDescription}>Instrucciones para los Miembros de mesa</Text>
@@ -70,9 +70,9 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 5: Cronograma */}
-          <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/Cronograma")}>
-            <MaterialIcons name="person-search" size={30} color="#007AFF" />
+          {/* Opción 6: Cronograma - CAMBIADO */}
+          <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/cronograma")}>
+            <MaterialIcons name="event" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
               <Text style={styles.menuButtonText}>Cronograma</Text>
               <Text style={styles.menuButtonDescription}>Fechas para los próximos eventos</Text>
