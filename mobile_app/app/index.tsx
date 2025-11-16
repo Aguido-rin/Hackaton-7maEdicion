@@ -88,9 +88,11 @@ export default function LoginScreen() {
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Iniciar Sesión</Text>}
         </TouchableOpacity>
 
+        {/* 
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
+        */}
       </View>
 
       <View style={styles.footerContainer}>
