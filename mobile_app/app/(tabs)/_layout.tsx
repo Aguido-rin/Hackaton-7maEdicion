@@ -1,80 +1,100 @@
-import { Tabs } from "expo-router";
 import React from "react";
-
-import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
+import { Tabs } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Colors } from "@/constants/theme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme ?? "light"];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarActiveTintColor: theme.tint,
+        tabBarInactiveTintColor: "#6b7280",
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 0.5,
+          borderTopColor: "#e5e7eb",
+          height: 56,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+        },
       }}
     >
+      {}
+
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
-          ),
+          title: "Inicio",
+          tabBarLabel: "Inicio",
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="home" size={size} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
-        }}
-      />
-      {/* 👉 Agrega esta nueva pestaña */}
+
       <Tabs.Screen
         name="calendario"
         options={{
           title: "Calendario",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="calendar" color={color} />
-          ),
+          tabBarLabel: "Calendario",
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="event" size={size} color={color} />,
         }}
       />
+
       <Tabs.Screen
-        name="agrupaciones"
-        options={{
-          title: "Agrupaciones",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.3.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="elector"
+        name="elector/index"
         options={{
           title: "Elector",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="chevron.right" color={color} />
-            // si luego quieres, te enseño cómo agregar un iconito tipo "persona"
-          ),
+          tabBarLabel: "Elector",
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="how-to-vote" size={size} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="miembros/index"
+        options={{
+          title: "Miembro de mesa",
+          tabBarLabel: "Miembro",
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="badge" size={size} color={color} />,
+        }}
+      />
+
+      {}
+      {}
+
+      {}
+      <Tabs.Screen
+        name="explore"
+        options={{
+          href: null,
+        }}
+      />
+
+      {}
+      <Tabs.Screen
+        name="agrupaciones/index"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
-        name="miembros"
+        name="agrupaciones/[id]"
         options={{
-          title: "Miembros",
-          // usa un icono que ya tengas mapeado (ej: paperplane.fill)
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
+          href: null,
         }}
       />
-        
+      <Tabs.Screen
+        name="agrupaciones/candidato/[id]"
+        options={{
+          href: null,
+        }}
+      />
+
+      {}
     </Tabs>
   );
 }
