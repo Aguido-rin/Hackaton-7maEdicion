@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Image,
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -52,8 +53,9 @@ export default function LoginScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Centros de Votación</Text>
-        <Text style={styles.subtitle}>Encuentra tu centro de Votación </Text>
+        <Text style={styles.title}>Comitia App</Text>
+        <Text style={styles.subtitle}>Developed by GalactcDevs </Text>
+        <Image style={styles.logo} source={require("../assets/images/GalacticDevs_Logo_Blanco.png")} />
       </View>
 
       <View style={styles.formContainer}>
@@ -102,6 +104,12 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
+    marginBottom: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
