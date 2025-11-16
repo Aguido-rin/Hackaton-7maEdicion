@@ -50,7 +50,7 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 4: electores - CAMBIADO */}
+          {/* Opción 4: electores */}
           <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/electores")}>
             <MaterialIcons name="how-to-vote" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
@@ -60,7 +60,7 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 5: miembrosmesa - CAMBIADO */}
+          {/* Opción 5: miembrosmesa */}
           <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/miembrosmesa")}>
             <MaterialIcons name="supervisor-account" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
@@ -70,7 +70,7 @@ export default function HomeScreen() {
             <MaterialIcons name="chevron-right" size={24} color="#bdc3c7" />
           </TouchableOpacity>
 
-          {/* Opción 6: Cronograma - CAMBIADO */}
+          {/* Opción 6: Cronograma */}
           <TouchableOpacity style={styles.menuButton} onPress={() => handleNavigation("/cronograma")}>
             <MaterialIcons name="event" size={30} color="#007AFF" />
             <View style={styles.menuTextContainer}>
