@@ -1,14 +1,52 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
+import axios from "axios";
+
+// `http://192.168.18.55:5000` — cambia a la IP de tu equipo cuando pruebes en dispositivo.
+const API_BASE = "http://192.168.18.55:5000";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [email, setEmail] = React.useState("");
+  const [dni, setDni] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  const handleLogin = () => {
-    router.push("/mapa");
+  const handleLogin = async () => {
+    if (!dni || !password) {
+      Alert.alert("Faltan datos", "Ingresa DNI y contraseña.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = { dni, password };
+      const resp = await axios.post(`${API_BASE}/api/login`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (resp.data && resp.data.success) {
+        // Login correcto — navegar a mapa
+        // Puedes guardar `resp.data` en un storage seguro si lo deseas
+        router.push("/mapa");
+      } else {
+        Alert.alert("Error", resp.data?.error || "Respuesta inesperada del servidor");
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err.message || "Error al autenticar";
+      Alert.alert("Login fallido", msg.toString());
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,14 +58,15 @@ export default function LoginScreen() {
 
       <View style={styles.formContainer}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Correo Electrónico</Text>
+          <Text style={styles.label}>DNI</Text>
           <TextInput
             style={styles.input}
-            placeholder="tu@correo.com"
+            placeholder="12345678"
             placeholderTextColor="#999"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            keyboardType="numeric"
+            value={dni}
+            onChangeText={setDni}
+            maxLength={8}
           />
         </View>
 
@@ -43,8 +82,8 @@ export default function LoginScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Iniciar Sesión</Text>}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.forgotPassword}>
@@ -54,7 +93,7 @@ export default function LoginScreen() {
 
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>¿No tienes cuenta?</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/register")}>
           <Text style={styles.signupLink}>Regístrate aquí</Text>
         </TouchableOpacity>
       </View>

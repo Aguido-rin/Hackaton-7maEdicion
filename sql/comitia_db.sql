@@ -49,14 +49,12 @@ CREATE TABLE IF NOT EXISTS Mesas (
 CREATE TABLE IF NOT EXISTS Usuarios (
   id_usuario CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   dni VARCHAR(8) NOT NULL UNIQUE,
-  email VARCHAR(255) UNIQUE, 
-  password_hash VARCHAR(255), 
-  id_mesa INT NULL,           
+  email VARCHAR(255) UNIQUE,
+  password_hash VARCHAR(255),
+  id_mesa INT NULL,
   rol ENUM('Elector', 'MiembroMesa') NOT NULL DEFAULT 'Elector',
-  
   -- Índice para acelerar las búsquedas por DNI (ya cubierto por UNIQUE)
   -- INDEX idx_dni (dni), -- 'UNIQUE' ya crea un índice
-  
   -- Índice para acelerar las búsquedas por mesa
   INDEX idx_id_mesa (id_mesa), 
   
@@ -95,41 +93,53 @@ CREATE TABLE IF NOT EXISTS PartidosPoliticos (
   
 ) COMMENT='Agrupaciones políticas. Logos guardados como BLOB.';
 
-INSERT INTO CentrosVotacion (id_centro, nombre, direccion, distrito, latitud, longitud)
-VALUES (
-  UUID(),
-  'IE 7069 José María Arguedas',
-  'Av. Los Héroes 345',
-  'San Juan de Miraflores',
-  -12.157892,
-  -76.971234
-);
-
-INSERT INTO CentrosVotacion (id_centro, nombre, direccion, distrito, latitud, longitud)
-VALUES (
-  UUID(),
-  'Colegio Nacional Ricardo Palma',
-  'Jr. Los Sauces 180',
-  'Surquillo',
-  -12.112345,
-  -77.012345
-);
+INSERT INTO CentrosVotacion (id_centro, nombre, direccion, distrito, latitud, longitud) VALUES
+(UUID(), 'IE 7069 José María Arguedas', 'Av. Los Héroes 345', 'San Juan de Miraflores', -12.157892, -76.971234),
+(UUID(), 'Colegio Nacional Ricardo Palma', 'Av. Ricardo Palma 240', 'Surquillo', -12.112345, -77.012345),
+(UUID(), 'IE 7089 Romeo Luna Victoria', 'Av. Aviación 4850', 'Santiago de Surco', -12.138850, -76.995120),
+(UUID(), 'GUE Alfonso Ugarte', 'Av. Alfonso Ugarte 1230', 'Lima', -12.049510, -77.042830),
+(UUID(), 'Colegio San Agustín', 'Av. Javier Prado Este 5560', 'La Molina', -12.074010, -76.953050);
 
 SELECT id_centro, nombre FROM CentrosVotacion;
 
-INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle)
-VALUES (
-  'c92c46b4-c254-11f0-9f78-a841f415c3a6',
-  '045123',
-  'Pabellón A - Aula 4'
-);
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle) VALUES
+('c92c46b4-c254-11f0-9f78-a841f415c3a6', '045125', 'Pabellón A - Aula 5'),
+('c92c46b4-c254-11f0-9f78-a841f415c3a6', '045126', 'Pabellón A - Aula 6'),
+('c92c46b4-c254-11f0-9f78-a841f415c3a6', '045127', 'Pabellón B - Aula 1'),
+('c92c46b4-c254-11f0-9f78-a841f415c3a6', '045128', 'Pabellón B - Aula 2'),
+('c92c46b4-c254-11f0-9f78-a841f415c3a6', '045129', 'Pabellón B - Aula 3');
 
-INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle)
-VALUES (
-  'c92e2d81-c254-11f0-9f78-a841f415c3a6',
-  '045124',
-  'Pabellón B - Aula 7'
-);
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle) VALUES
+('c92e2d81-c254-11f0-9f78-a841f415c3a6', '045130', 'Pabellón C - Aula 1'),
+('c92e2d81-c254-11f0-9f78-a841f415c3a6', '045131', 'Pabellón C - Aula 2'),
+('c92e2d81-c254-11f0-9f78-a841f415c3a6', '045132', 'Pabellón C - Aula 3'),
+('c92e2d81-c254-11f0-9f78-a841f415c3a6', '045133', 'Patio Central - Zona 1'),
+('c92e2d81-c254-11f0-9f78-a841f415c3a6', '045134', 'Patio Central - Zona 2');
+
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle) VALUES
+('80b5f2bb-c325-11f0-ad84-a841f415c3a6', '045135', 'Pabellón A - Aula 1'),
+('80b5f2bb-c325-11f0-ad84-a841f415c3a6', '045136', 'Pabellón A - Aula 2'),
+('80b5f2bb-c325-11f0-ad84-a841f415c3a6', '045137', 'Pabellón A - Aula 3'),
+('80b5f2bb-c325-11f0-ad84-a841f415c3a6', '045138', 'Pabellón A - Aula 4'),
+('80b5f2bb-c325-11f0-ad84-a841f415c3a6', '045139', 'Pabellón A - Aula 5');
+
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle) VALUES
+('80b5ff88-c325-11f0-ad84-a841f415c3a6', '045140', 'Pabellón 1 - Aula 101'),
+('80b5ff88-c325-11f0-ad84-a841f415c3a6', '045141', 'Pabellón 1 - Aula 102'),
+('80b5ff88-c325-11f0-ad84-a841f415c3a6', '045142', 'Pabellón 1 - Aula 103'),
+('80b5ff88-c325-11f0-ad84-a841f415c3a6', '045143', 'Pabellón 2 - Aula 201'),
+('80b5ff88-c325-11f0-ad84-a841f415c3a6', '045144', 'Pabellón 2 - Aula 202');
+
+INSERT INTO Mesas (id_centro, numero_mesa, ubicacion_detalle) VALUES
+('80b60281-c325-11f0-ad84-a841f415c3a6', '045145', 'Coliseo - Zona A'),
+('80b60281-c325-11f0-ad84-a841f415c3a6', '045146', 'Coliseo - Zona B'),
+('80b60281-c325-11f0-ad84-a841f415c3a6', '045147', 'Coliseo - Zona C'),
+('80b60281-c325-11f0-ad84-a841f415c3a6', '045148', 'Patio Principal - Mesa 1'),
+('80b60281-c325-11f0-ad84-a841f415c3a6', '045149', 'Patio Principal - Mesa 2');
+
+USE comitia_db;
 
 SELECT * FROM PartidosPoliticos;
 SELECT * FROM candidatos;
+SELECT * FROM usuarios;
+SELECT * FROM mesas;
