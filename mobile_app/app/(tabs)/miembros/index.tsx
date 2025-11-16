@@ -319,15 +319,7 @@ export default function MemberScreen() {
               contentContainerStyle={{ gap: 8, marginTop: 8 }}
             />
 
-            <Pressable
-              style={styles.calendarButton}
-              onPress={handleAddElectionDayToCalendar}
-            >
-              <MaterialIcons name="add-alert" size={18} color="#fff" />
-              <Text style={styles.calendarButtonText}>
-                Agregar el día de la elección a mi calendario
-              </Text>
-            </Pressable>
+           
           </View>
         )}
 
