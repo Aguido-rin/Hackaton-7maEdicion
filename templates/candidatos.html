@@ -14,13 +14,17 @@
 
 <!-- Filtro por nombre del partido -->
 <div class="row mb-4">
-    <div class="col-md-8 offset-md-2">
-      
-        <div class="input-group">
-            <input type="text" id="filtro-partido" class="form-control" placeholder="Buscar por nombre del partido...">
-            <button class="btn btn-outline-secondary" type="button" id="btn-buscar-partido">Buscar</button>
-        </div>
-        
+  <div class="col-md-8 offset-md-2">
+    <div class="input-group">
+      <input
+        type="text"
+        id="filtro-partido"
+        class="form-control"
+        placeholder="Buscar por nombre del partido..."
+      />
+      <button class="btn btn-outline-secondary" id="btn-buscar-partido">
+        Buscar
+      </button>
     </div>
   </div>
 </div>
@@ -56,32 +60,53 @@ async function cargarCandidatos(nombrePartido = null) {
       const col = document.createElement("div");
       col.className = "col-md-6 mb-4";
 
-      
-      // Accedemos a los datos usando la NUEVA estructura plana del endpoint API
-      const imagenSrc = c.foto_candidato_principal ? `image/jpeg;base64,${c.foto_candidato_principal}` : 'https://via.placeholder.com/150'; // Imagen por defecto si no hay
-        
-      // Truncar biografía
+      // Imagen corregida ✔
+      const imagenSrc = c.foto_candidato_principal
+        ? `data:image/jpeg;base64,${c.foto_candidato_principal}`
+        : "https://via.placeholder.com/180x200?text=Sin+Foto";
+
+      // Biografía corta ✔
       let biografia = c.biografia || "Biografía no disponible.";
       if (biografia.length > 100) biografia = biografia.substring(0, 100) + "...";
 
       // Tarjeta completa ✔
       col.innerHTML = `
-        <div class="card card-radius h-100">
-          <div class="row g-0">
-            <div class="col-md-4">
-            <!--   <img src="${imagenSrc}" class="img-fluid rounded-start" alt=" ${c.nombre_completo}" style="object-fit: cover; height: 100%;">  -->
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">${c.nombre_completo}</h5>
-                <p class="card-text mb-1"><strong>Partido:</strong> ${c.nombre_partido} (${c.siglas_partido || ''})</p>
-                <p class="card-text mb-1"><strong>Tipo:</strong> ${c.tipo_candidatura}</p>
-                <p class="card-text mb-1"><strong>Región:</strong> ${c.region || 'No especificada'}</p>
-                <p class="card-text"><small class="text-muted fst-italic">"${biografia}"</small></p>
-                <a href="${c.perfil_url || '#'}" class="btn btn-sm btn-outline-primary mt-2" target="_blank" ${c.perfil_url ? '' : 'disabled'}>
-                  Ver Foto
-                </a>
-              </div>
+      <div class="card h-100 shadow-sm">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img 
+              src="${imagenSrc}" 
+              class="img-fluid rounded-start"
+              alt="Foto de ${c.nombre_completo}"
+              style="object-fit: cover; height: 100%; width: 100%;">
+          </div>
+
+          <div class="col-md-8">
+            <div class="card-body">
+
+              <h5 class="card-title">${c.nombre_completo}</h5>
+
+              <p class="card-text mb-1"><strong>Partido:</strong> 
+                ${c.nombre_partido} ${c.siglas_partido ? "(" + c.siglas_partido + ")" : ""}
+              </p>
+
+              <p class="card-text mb-1"><strong>Tipo:</strong> ${c.tipo_candidatura}</p>
+
+              <p class="card-text mb-1"><strong>Región:</strong> 
+                ${c.region || "No especificada"}
+              </p>
+
+              <p class="card-text">
+                <small class="text-muted fst-italic">"${biografia}"</small>
+              </p>
+
+              <a href="${c.perfil_url || "#"}" 
+                 class="btn btn-sm btn-outline-primary mt-2"
+                 target="_blank"
+                 ${c.perfil_url ? "" : "disabled"}>
+                 Ver Perfil
+              </a>
+
             </div>
           </div>
         </div>
@@ -107,5 +132,3 @@ document.getElementById("btn-buscar-partido").addEventListener("click", () => {
 cargarCandidatos();
 </script>
 {% endblock %}
-
-   
