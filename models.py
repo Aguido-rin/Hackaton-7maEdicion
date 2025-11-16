@@ -1,8 +1,9 @@
 import uuid
 from extensions import db
-from sqlalchemy import String, Integer, Date, Enum, ForeignKey, Numeric, Text
+from sqlalchemy import String, Integer, Date, Enum, ForeignKey, Numeric, Text, DateTime
 from sqlalchemy.dialects.mysql import CHAR, MEDIUMBLOB
 from sqlalchemy.orm import relationship
+from datetime import datetime 
 
 # --- Modelos de Usuarios y Ubicación ---
 
@@ -106,3 +107,35 @@ class PartidosPoliticos(db.Model):
 
     def __repr__(self):
         return f'<PartidosPoliticos {self.siglas or self.nombre_partido}>'
+    
+# --- Modelo de Candidato ---
+
+class Candidatos(db.Model):
+    __tablename__ = 'candidatos'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_completo = db.Column(db.String(255), nullable=False)
+    
+    # 'Gobernador' o 'Alcalde'
+    tipo_candidatura = db.Column(db.String(11)) 
+    
+    # URL al perfil detallado en eleccionesperu.pe
+    perfil_url = db.Column(db.String(500), unique=True) 
+    
+    # BLOB para almacenar la foto descargada
+    imagen_blob = db.Column(MEDIUMBLOB, nullable=True)
+    partido_politico_id = db.Column(
+        CHAR(36), 
+        db.ForeignKey('PartidosPoliticos.id_partido'),
+        nullable=True
+    )
+    
+    region = db.Column(db.String(50), nullable=True)
+    biografia = db.Column(db.Text, nullable=True)
+    
+    fecha_creacion = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    
+    partido_politico = relationship('PartidosPoliticos', backref=db.backref('candidatos', lazy=True))
+
+    def __repr__(self):
+        return f'<CandidatoRegional {self.nombre_completo}>'
