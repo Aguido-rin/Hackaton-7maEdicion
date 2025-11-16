@@ -1,0 +1,15 @@
+export interface Partido {
+  id_partido: string;
+  jne_id_simbolo: number | null;
+  nombre_partido: string;
+  siglas: string | null;
+  fecha_inscripcion: string | null;
+  logo_base64: string | null;
+  direccion_legal: string | null;
+  telefonos: string | null;
+  sitio_web: string | null;
+  email_contacto: string | null;
+  personero_titular: string | null;
+  personero_alterno: string | null;
+  ideologia: "Izquierda" | "CentroIzquierda" | "Centro" | "CentroDerecha" | "Derecha" | "Otro" | "Desconocido" | null;
+}
