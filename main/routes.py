@@ -1,7 +1,6 @@
 import base64
 from flask import Blueprint, render_template, jsonify, request
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import PartidosPoliticos, CentrosVotacion, Usuarios, Mesas
+from models import PartidosPoliticos, CentrosVotacion, Candidatos
 from extensions import db
 
 main = Blueprint('main', __name__)
@@ -72,103 +71,6 @@ def get_partidos():
         # Devolver un error 500 en formato JSON si algo falla
         return jsonify({"error": str(e)}), 500
 
-
-# --- AUTENTICACIÓN: registro e inicio de sesión (API móvil) ---
-@main.route('/api/register', methods=['POST'])
-def api_register():
-    """Registrar un nuevo usuario desde la app móvil.
-    Espera JSON: {"dni": "12345678", "password": "abc123", "email": "opcional@x.com", "id_mesa": 1, "rol": "Elector"}
-    """
-    try:
-        data = request.get_json() or {}
-        dni = (data.get('dni') or '').strip()
-        password = data.get('password')
-        email = (data.get('email') or None)
-        id_mesa = data.get('id_mesa')
-        rol = data.get('rol') or 'Elector'
-
-        if not dni or not password:
-            return jsonify({'error': 'dni and password are required'}), 400
-
-        # Verificar existencia por DNI o email
-        if Usuarios.query.filter_by(dni=dni).first():
-            return jsonify({'error': 'DNI already registered'}), 409
-        if email and Usuarios.query.filter_by(email=email).first():
-            return jsonify({'error': 'Email already registered'}), 409
-
-        # Si se provee id_mesa, validar que exista
-        if id_mesa is not None:
-            mesa = Mesas.query.get(id_mesa)
-            if mesa is None:
-                return jsonify({'error': 'Mesa not found'}), 400
-
-        # Hashear contraseña
-        pw_hash = generate_password_hash(password)
-
-        nuevo = Usuarios(
-            dni=dni,
-            email=email,
-            password_hash=pw_hash,
-            id_mesa=id_mesa,
-            rol=rol
-        )
-        db.session.add(nuevo)
-        db.session.commit()
-
-        return jsonify({
-            'id_usuario': nuevo.id_usuario,
-            'dni': nuevo.dni,
-            'email': nuevo.email,
-            'rol': nuevo.rol,
-            'id_mesa': nuevo.id_mesa
-        }), 201
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error en /api/register: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@main.route('/api/login', methods=['POST'])
-def api_login():
-    """Iniciar sesión. Acepta JSON con `dni` o `email` y `password`.
-    Responde con datos básicos del usuario si la autenticación es correcta.
-    """
-    try:
-        data = request.get_json() or {}
-        dni = data.get('dni')
-        email = data.get('email')
-        password = data.get('password')
-
-        if not password or (not dni and not email):
-            return jsonify({'error': 'Provide dni or email and password'}), 400
-
-        user = None
-        if dni:
-            user = Usuarios.query.filter_by(dni=dni).first()
-        elif email:
-            user = Usuarios.query.filter_by(email=email).first()
-
-        if not user or not user.password_hash:
-            return jsonify({'error': 'Invalid credentials'}), 401
-
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({'error': 'Invalid credentials'}), 401
-
-        # Responder con la info del usuario (sin password)
-        return jsonify({
-            'success': True,
-            'id_usuario': user.id_usuario,
-            'dni': user.dni,
-            'email': user.email,
-            'rol': user.rol,
-            'id_mesa': user.id_mesa
-        })
-
-    except Exception as e:
-        print(f"Error en /api/login: {e}")
-        return jsonify({'error': str(e)}), 500
-
 # --- FIN: API PARA LA APP MÓVIL ---
 
 # ... (puedes añadir tus otras rutas web aquí si es necesario)
@@ -187,4 +89,105 @@ def parte4():
 
 @main.route('/candidatos')
 def candidatos_view():
-    return render_template('candidatos.html')
+    """
+    Ruta para la vista web de candidatos.
+    Obtiene todos los candidatos y los pasa a la plantilla.
+    """
+    try:
+        # Obtén todos los candidatos de la base de datos con su partido asociado
+        candidatos_db = db.session.query(Candidatos).join(
+            PartidosPoliticos, 
+            Candidatos.partido_politico_id == PartidosPoliticos.id_partido
+        ).all()
+
+        candidatos_serializados = []
+        for candidato in candidatos_db:
+            imagen_base64 = None
+            if candidato.imagen_blob:
+                imagen_base64 = base64.b64encode(candidato.imagen_blob).decode('utf-8')
+
+            # Codificar el logo del partido a base64
+            logo_partido_base64 = None
+            if candidato.partido_politico and candidato.partido_politico.logo_blob:
+                logo_partido_base64 = base64.b64encode(candidato.partido_politico.logo_blob).decode('utf-8')
+
+            candidatos_serializados.append({
+                'id': candidato.id,
+                'nombre_completo': candidato.nombre_completo,
+                'tipo_candidatura': candidato.tipo_candidatura,
+                'perfil_url': candidato.perfil_url,
+                'region': candidato.region,
+                'biografia': candidato.biografia,
+                'imagen_base64': imagen_base64,
+                'partido': {
+                    'nombre': candidato.partido_politico.nombre_partido,
+                    'siglas': candidato.partido_politico.siglas,
+                    'logo_base64': logo_partido_base64
+                }
+            })
+
+        # Pasa la lista serializada a la plantilla
+        return render_template('candidatos.html', candidatos=candidatos_serializados)
+
+    except Exception as e:
+        print(f"Error en /candidatos: {e}")
+        # Opcional: Renderizar una plantilla de error o pasar una lista vacía
+        return render_template('candidatos.html', candidatos=[], error=str(e))
+
+
+@main.route('/api/candidatos')
+def api_candidatos():
+    """
+    Endpoint de API para obtener los candidatos con filtros.
+    Ahora incluye región y biografía, y permite filtrar por nombre del partido.
+    Usa LEFT JOIN para mostrar candidatos sin partido.
+    """
+    try:
+        # Obtener parámetros de consulta
+        partido_nombre = request.args.get('partido_nombre', None)
+
+        # Construir la consulta inicial usando OUTERJOIN (LEFT JOIN)
+        query = db.session.query(Candidatos, PartidosPoliticos).outerjoin(
+            PartidosPoliticos, 
+            Candidatos.partido_politico_id == PartidosPoliticos.id_partido
+        )
+
+        # Aplicar filtro por nombre del partido si se proporciona
+        if partido_nombre:
+            query = query.filter(PartidosPoliticos.nombre_partido.ilike(f'%{partido_nombre}%'))
+
+        # Ejecutar la consulta
+        results = query.all()
+
+        # Serializar los resultados
+        lista_candidatos = []
+        for candidato, partido in results:
+            # Codificar la imagen del candidato a base64
+            foto_candidato_principal = None
+            if candidato.imagen_blob:
+                foto_candidato_principal = base64.b64encode(candidato.imagen_blob).decode('utf-8')
+
+            # Manejar el caso donde el partido es NULL
+            nombre_partido = partido.nombre_partido if partido else "Sin Partido"
+            siglas_partido = partido.siglas if partido else ""
+            direccion_legal_partido = partido.direccion_legal if partido else "No disponible"
+            jne_id_simbolo = partido.jne_id_simbolo if partido else "N/A"
+
+            lista_candidatos.append({
+                'nombre_partido': nombre_partido,
+                'siglas_partido': siglas_partido,
+                'foto_candidato_principal': foto_candidato_principal,
+                'direccion_legal_partido': direccion_legal_partido,
+                'nombre_completo': candidato.nombre_completo,
+                'tipo_candidatura': candidato.tipo_candidatura,
+                'perfil_url': candidato.perfil_url,
+                'jne_id_simbolo': jne_id_simbolo,
+                'region': candidato.region,
+                'biografia': candidato.biografia
+            })
+
+        return jsonify(lista_candidatos)
+
+    except Exception as e:
+        print(f"Error en /api/candidatos: {e}")
+        return jsonify({"error": str(e)}), 500
