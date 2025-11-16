@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Dimensions, TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
 import axios from "axios";
+import ChatbotScreen from "./chatbot/chatbot";
 
 interface Centro {
   id: string;
@@ -15,6 +16,7 @@ export default function MapaScreen() {
   const [centros, setCentros] = useState<Centro[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCentro, setSelectedCentro] = useState<Centro | null>(null);
+  const [isChatbotVisible, setIsChatbotVisible] = useState(false);
 
   useEffect(() => {
     fetchCentros();
@@ -96,6 +98,20 @@ export default function MapaScreen() {
           </View>
         ))}
       </ScrollView>
+      {/* Botón flotante (FAB) para abrir el chatbot */}
+      <TouchableOpacity style={styles.fab} onPress={() => setIsChatbotVisible(true)}>
+        <Text style={styles.fabIcon}>?</Text>
+      </TouchableOpacity>
+      
+      {/* ¡Advertencia de Seguridad! 
+          No expongas tu API Key aquí. 
+          Recomiendo usar variables de entorno.
+      */}
+      <ChatbotScreen
+        isVisible={isChatbotVisible}
+        onClose={() => setIsChatbotVisible(false)}
+        apiKey="AIzaSyBExd-A--7cs8PrOSfVweYrqTNcmgcLwQg"
+      />
     </View>
   );
 }
@@ -140,5 +156,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     marginTop: 4,
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: "#007AFF",
+    borderRadius: 28,
+    elevation: 8,
+  },
+  fabIcon: {
+    fontSize: 24,
+    color: "white",
   },
 });

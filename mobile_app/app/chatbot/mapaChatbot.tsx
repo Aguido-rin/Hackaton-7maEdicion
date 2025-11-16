@@ -103,7 +103,11 @@ export default function MapaScreen() {
       </TouchableOpacity>
       {/* TODO: Replace "YOUR_GEMINI_API_KEY" with your actual Gemini API key. */}
       {/* For production, it's recommended to store the API key in a secure way, e.g., using environment variables. */}
-      <ChatbotScreen isVisible={isChatbotVisible} onClose={() => setIsChatbotVisible(false)} apiKey="AIzaSyBExd-A--7cs8PrOSfVweYrqTNcmgcLwQg" />
+      <ChatbotScreen
+        isVisible={isChatbotVisible}
+        onClose={() => setIsChatbotVisible(false)}
+        apiKey="AIzaSyBExd-A--7cs8PrOSfVweYrqTNcmgcLwQg"
+      />
     </View>
   );
 }
@@ -150,19 +154,19 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   fab: {
-    position: 'absolute',
+    position: "absolute",
     width: 56,
     height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     right: 20,
     bottom: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 28,
     elevation: 8,
   },
   fabIcon: {
     fontSize: 24,
-    color: 'white',
+    color: "white",
   },
 });
