@@ -8,7 +8,7 @@ from extensions import db
 from models import Candidatos
 from sqlalchemy.exc import IntegrityError
 
-#instalar dependencias: venv38/Scripts/activate && pip install -r requirements.txt
+#instalar dependencias: source venv38/Scripts/activate && pip install -r requirements.txt
 #Ejecución: python scraperCandidatos_util.py
 
 
